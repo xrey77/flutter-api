@@ -1,0 +1,48 @@
+CREATE TABLE public.contacts (
+	id int4 NOT NULL,
+	contact_name varchar NULL,
+	contact_address varchar NULL,
+	contact_email varchar NULL,
+	contact_mobileno varchar NULL,
+	isactive int4 NULL DEFAULT 0,
+	CONSTRAINT contacts_pk PRIMARY KEY (id),
+	CONSTRAINT contacts_un UNIQUE (contact_name)
+);
+
+
+CREATE TABLE public.users (
+	id int4 NOT NULL,
+	lastname varchar NULL,
+	firstname varchar NULL,
+	email varchar NULL,
+	mobile varchar NULL,
+	username varchar NULL,
+	"password" varchar NULL,
+	userpicture varchar NULL,
+	otp int4 NULL DEFAULT 0,
+	secretkey varchar NULL,
+	createdat timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP,
+	updatedat timestamp(0) NULL,
+	isactivated int4 NULL DEFAULT 0,
+	mailtoken int4 NULL DEFAULT 0,
+	"role" varchar NULL DEFAULT 'USER'::character varying,
+	qrcode varchar NULL,
+	CONSTRAINT users_pk PRIMARY KEY (id),
+	CONSTRAINT users_un UNIQUE (email, username)
+);
+
+CREATE SEQUENCE public.contactid
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+CREATE SEQUENCE public.userid
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
