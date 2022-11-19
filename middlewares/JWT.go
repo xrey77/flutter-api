@@ -48,7 +48,7 @@ func JwtAuthentication(h http.Handler) gin.HandlerFunc {
 		if len(splitted) != 2 {
 			response = utilz.Message(false, "Invalid/Malformed auth token")
 			c.AbortWithStatus(403)
-			c.Request.Header.Add("Content-Type", "application/json")
+			c.Request.Header.Add("Content-Type", "application/json;charset=utf-8")
 			utilz.Respond(c.Writer, response)
 			return
 		}

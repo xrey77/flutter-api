@@ -28,12 +28,12 @@ func Register(c *gin.Context) {
 	pwd := user.Password
 
 	if utilz.ValidateEmail(email) > 0 {
-		c.JSON(200, gin.H{"message": "Email has already taken."})
+		c.JSON(405, gin.H{"message": "Email has already taken."})
 		return
 	}
 
 	if utilz.ValidateUserName(username) > 0 {
-		c.JSON(201, gin.H{"message": "Username has already taken."})
+		c.JSON(406, gin.H{"message": "Username has already taken."})
 		return
 	}
 
@@ -60,7 +60,7 @@ func Register(c *gin.Context) {
 		qrcode) VALUES(nextval('userid'),$1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 	res, err3 := db.Exec(sqlStatement, &lastname, &firstname, &email, &username, &hashPwd, 1, &mobile, &urlpic, "", "")
 	if err3 != nil {
-		c.JSON(400, gin.H{"message": "Unable to execute the query."})
+		c.JSON(500, gin.H{"message": "Unable to execute the query."})
 		return
 	}
 	idno, _ := res.RowsAffected()

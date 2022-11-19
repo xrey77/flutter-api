@@ -24,26 +24,26 @@ func Login(c *gin.Context) {
 		log.Fatalf("Unable to decode the request body.  %v", err)
 	}
 
-	c.Header("Content-Type", "application/json charset=utf-8")
+	c.Header("Content-Type", "application/json;charset=utf-8")
 	uname := user.UserName
 	pwd2 := user.PassWord
 
 	if utilz.ValidateUserName(uname) == 0 {
-		c.JSON(400, gin.H{"message": "Username is not yet registered, please click register link at the top right of the screen."})
+		c.JSON(404, gin.H{"message": "Username is not yet registered, please click register link at the top right of the screen."})
 		return
 	}
 
 	if utilz.IsActivated(uname) == 0 {
-		c.JSON(200, gin.H{"message": "You account is not yet activated, please check you Email inbox and click Activate button."})
+		c.JSON(406, gin.H{"message": "You account is not yet activated, please check you Email inbox and click Activate button."})
 		return
 	}
 
 	db := config.Connect()
 	defer db.Close()
 	var tmpUser models.UserLogin
-	sqlFindUsername := `SELECT id,username,password,userpicture,role,otp FROM USERS WHERE username=$1;`
+	sqlFindUsername := `SELECT id,username,password,userpicture,role,otp,isactivated,email FROM USERS WHERE username=$1;`
 	rowUsername := db.QueryRow(sqlFindUsername, uname)
-	err2 := rowUsername.Scan(&tmpUser.ID, &tmpUser.UserName, &tmpUser.PassWord, &tmpUser.Userpicture, &tmpUser.Role, &tmpUser.Otp)
+	err2 := rowUsername.Scan(&tmpUser.ID, &tmpUser.UserName, &tmpUser.PassWord, &tmpUser.Userpicture, &tmpUser.Role, &tmpUser.Otp, &tmpUser.IsActivated, &tmpUser.Email)
 	if err2 != nil {
 		fmt.Println(err2)
 	}
@@ -62,10 +62,11 @@ func Login(c *gin.Context) {
 		tokenString, _ := token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 		tmpUser.Token = tokenString
 		totp := strconv.FormatInt(tmpUser.Otp, 2)
-		msg := map[string]string{"id": xid, "username": tmpUser.UserName, "token": tmpUser.Token, "userpicture": tmpUser.Userpicture, "role": tmpUser.Role, "otp": totp}
+		isActive := strconv.FormatInt(tmpUser.IsActivated, 2)
+		msg := map[string]string{"id": xid, "username": tmpUser.UserName, "token": tmpUser.Token, "userpicture": tmpUser.Userpicture, "role": tmpUser.Role, "otp": totp, "isactivated": isActive, "email": tmpUser.Email}
 		c.JSON(http.StatusOK, msg)
 	} else {
-		c.JSON(200, gin.H{"message": "Wrong password."})
+		c.JSON(401, gin.H{"message": "Wrong password."})
 		return
 	}
 }

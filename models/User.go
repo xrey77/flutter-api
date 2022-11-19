@@ -55,10 +55,12 @@ type UserLogin struct {
 	ID          uint   `json:"id"`
 	UserName    string `json:"username"`
 	PassWord    string `json:"password"`
+	Email       string `json:"email"`
 	Userpicture string `json:"userpicture"`
 	Token       string `json:"token"`
 	Role        string `json:"role"`
 	Otp         int64  `json:"otp"`
+	IsActivated int64  `json:"isactivated"`
 }
 
 // Token       string `json:"token";sql:"-"`
