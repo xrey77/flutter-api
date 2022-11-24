@@ -61,6 +61,25 @@ type TempUsers struct {
 	Mailtoken   string `json:"mailtoken"`
 }
 
+type Tempusers struct {
+	ID          int64
+	Lastname    string `binding:"required,min=30,max=30"`
+	Firstname   string `binding:"required,min=30,max=30"`
+	Email       string `binding:"required,min=100,max=100"`
+	Mobile      string `binding:"required,min=20,max=20"`
+	Username    string `binding:"required,min=5,max=30"`
+	Userpicture string `binding:"required,min=10,max=10"`
+	Role        string `binding:"required,min=10,max=10"`
+	Password    string `binding:"required,min=100,max=100"`
+	Isactivated int64
+	Mailtoken   string `binding:"required,min=50,max=50"`
+	Otp         int64
+	Secretkey   string `binding:"required,min=250,max=250"`
+	Qrcode      string `binding:"required,min=350,max=350"`
+	Createdat   time.Time
+	Updatedat   time.Time
+}
+
 type Userlogin struct {
 	ID          int
 	Username    string `binding:"required,min=5,max=30"`

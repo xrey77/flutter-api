@@ -49,9 +49,9 @@ func main() {
 
 	router.POST("/user/login", middlewares.Login)
 	router.POST("/user/register", middlewares.Register)
-	// router.GET("/getuser/:id", middlewares.GetUserbyID)
-	// router.GET("/getuserid/:id", middlewares.GetUser)
-	// router.GET("/getallusers", middlewares.GetUsers)
+	router.GET("/getuser/:id", middlewares.GetUserbyID)
+	router.GET("/getuserid/:id", middlewares.GetUser)
+	router.GET("/getallusers", middlewares.GetUsers)
 	// router.DELETE("/deleteuser/:id", middlewares.DeleteUser)
 	// router.PUT("/updateuser/:id", middlewares.UpdateUser)
 	// router.PUT("/updateusermgt/:id", middlewares.UpdateUserMgt)
