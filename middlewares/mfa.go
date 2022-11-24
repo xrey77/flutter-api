@@ -44,10 +44,10 @@ func getsecretkey(uname string) string {
 	defer db.Close()
 	var tmpUser models.TempUsers
 	// FIND USERNAME IF IT IS ALREADY EXISTS
-	sqlFindUsername := `SELECT secretkey FROM USERS WHERE username=$1;`
-	rowUsername := db.QueryRow(sqlFindUsername, uname)
-	err2 := rowUsername.Scan(&tmpUser.Secretkey)
-	if err2 != nil {
+	// sqlFindUsername := `SELECT secretkey FROM USERS WHERE username=$1;`
+	// rowUsername := db.QueryRow(sqlFindUsername, uname)
+	// err2 := rowUsername.Scan(&tmpUser.Secretkey)
+	if err2 := db.Model(tmpUser).Where("username = ?", uname).Select(); err2 != nil {
 		return ""
 	} else {
 		return tmpUser.Secretkey

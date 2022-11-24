@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"src/flutter-api/config"
 	"src/flutter-api/models"
-	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,19 +28,49 @@ var NotFoundHandler = func(next http.Handler) http.Handler {
 	})
 }
 
-func ValidateUserName(usrname string) int64 {
+func ValidateUserName(usrname string) int {
 	db := config.Connect()
 	defer db.Close()
-	var tmpUser models.TempUsers
-	sqlUname := `SELECT username FROM USERS WHERE username=$1;`
-	userNamerow := db.QueryRow(sqlUname, usrname)
-	err2 := userNamerow.Scan(&tmpUser.Username)
-	if err2 != nil {
-		log.Print(err2.Error())
+	Tmpusers := new(models.Users)
+	if err22 := db.Model(Tmpusers).Where("username = ?", usrname).Select(); err22 != nil {
+		log.Print("Username not found.", err22.Error())
+		return 0
+	}
+	return 1
+}
+
+func IsActivated(usname string) int64 {
+	db := config.Connect()
+	defer db.Close()
+	tmpUser1 := new(models.Users)
+	if err23 := db.Model(tmpUser1).Where("username = ?", usname).Select(); err23 != nil {
+		return 0
+	}
+	return tmpUser1.Isactivated
+}
+
+func GetNextval() int64 {
+	db := config.Connect()
+	defer db.Close()
+	var users models.Users
+	err := db.Model(&users).Last()
+	log.Print("Count : ", users.ID)
+	if err != nil {
+		log.Print(err)
 		return 0
 	} else {
-		return 1
+		return int64(users.ID) + 1
 	}
+}
+
+func ValidateEmail(mail string) int {
+	db := config.Connect()
+	defer db.Close()
+	var tmpUser = new(models.Users)
+	if err2 := db.Model(tmpUser).Where("email = ?", mail).Select(); err2 != nil {
+		return 0
+	}
+	return 1
 }
 
 func ComparePassword(hashedPwd string, plainPwd []byte) bool {
@@ -61,11 +90,8 @@ func EncryptPassword(pwd string) []byte {
 func GetPasswd(usrname string) string {
 	db := config.Connect()
 	defer db.Close()
-	var tmpUser models.TempUsers
-	sqlFindUsername := `SELECT password FROM USERS WHERE username=$1;`
-	rowUsername := db.QueryRow(sqlFindUsername, usrname)
-	err2 := rowUsername.Scan(&tmpUser.Password)
-	if err2 != nil {
+	var tmpUser = new(models.Users)
+	if err2 := db.Model(tmpUser).Where("username = ?", usrname).Select(); err2 != nil {
 		return ""
 	} else {
 		return tmpUser.Password
@@ -75,71 +101,34 @@ func GetPasswd(usrname string) string {
 func GetPIC(usrname string) string {
 	db := config.Connect()
 	defer db.Close()
-	var tmpUser models.TempUsers
-	sqlFindUsername := `SELECT userpicture FROM USERS WHERE username=$1;`
-	rowUsername := db.QueryRow(sqlFindUsername, usrname)
-	err2 := rowUsername.Scan(&tmpUser.Userpicture)
-	if err2 != nil {
+	var tmpUser = new(models.Users)
+	if err2 := db.Model(tmpUser).Where("username = ?", usrname).Select(); err2 != nil {
 		return ""
 	} else {
 		return tmpUser.Userpicture
 	}
 }
 
-func IsActivated(usname string) int64 {
-	db := config.Connect()
-	defer db.Close()
-	var tmpUser1 models.TempUsers
-	sqlFindUname := `SELECT isactivated FROM USERS WHERE username=$1;`
-	rowUname := db.QueryRow(sqlFindUname, usname)
-	err23 := rowUname.Scan(&tmpUser1.Isactivated)
-	if err23 != nil {
-		return 0
-	} else {
-		return tmpUser1.Isactivated
-	}
-}
-
 func GetUID(usname string) string {
 	db := config.Connect()
 	defer db.Close()
-	var tmpUser1 models.TempUsers
-	sqlFindUname := `SELECT id FROM USERS WHERE username=$1;`
-	rowUname := db.QueryRow(sqlFindUname, usname)
-	err23 := rowUname.Scan(&tmpUser1.ID)
-	if err23 != nil {
+	var tmpUser1 = new(models.Users)
+	if err2 := db.Model(tmpUser1).Where("username = ?", usname).Select(); err2 != nil {
 		return ""
 	} else {
-		return strconv.FormatInt(tmpUser1.ID, 10)
+		return string(rune(tmpUser1.ID))
 	}
 }
 
 func GetOTP(usname string) int64 {
 	db := config.Connect()
 	defer db.Close()
-	var tmpUser2 models.TempUsers
-	sqlOTP := `SELECT otp FROM USERS WHERE username=$1;`
-	rowOTP := db.QueryRow(sqlOTP, usname)
-	err25 := rowOTP.Scan(&tmpUser2.Otp)
-	if err25 != nil {
+	var tmpUser2 = new(models.Users)
+	if err2 := db.Model(tmpUser2).Where("username = ?", usname).Select(); err2 != nil {
 		return 0
 	} else {
 		return tmpUser2.Otp
 	}
-}
-
-func ValidateEmail(mail string) int64 {
-	db := config.Connect()
-	defer db.Close()
-	var tmpUser models.TempUsers
-	//FIND EMAIL IF IT IS ALREADY EXISTS
-	sqlFindEmail := `SELECT email FROM USERS WHERE email=$1;`
-	rowEmail := db.QueryRow(sqlFindEmail, mail)
-	err1 := rowEmail.Scan(&tmpUser.Email)
-	if err1 != nil {
-		return 0
-	}
-	return 1
 }
 
 func HashAndSalt(pwd []byte) string {

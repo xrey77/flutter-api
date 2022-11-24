@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,56 +16,52 @@ import (
 )
 
 func Login(c *gin.Context) {
-
-	var user models.UserLogin
-	err := json.NewDecoder(c.Request.Body).Decode(&user)
+	var user = new(models.TmpLogin)
+	err := json.NewDecoder(c.Request.Body).Decode(user)
 	if err != nil {
-		log.Fatalf("Unable to decode the request body.  %v", err)
+		log.Print("Unable to decode the request body")
+		return
 	}
 
-	c.Header("Content-Type", "application/json;charset=utf-8")
+	c.Header("Content-Type", "application/json;charset=UTF-8")
+
 	uname := user.UserName
 	pwd2 := user.PassWord
-
-	if utilz.ValidateUserName(uname) == 0 {
+	vUsername := utilz.ValidateUserName(uname)
+	if (vUsername) == 0 {
 		c.JSON(404, gin.H{"message": "Username is not yet registered, please click register link at the top right of the screen."})
 		return
-	}
-
-	if utilz.IsActivated(uname) == 0 {
-		c.JSON(406, gin.H{"message": "You account is not yet activated, please check you Email inbox and click Activate button."})
-		return
+	} else {
+		if utilz.IsActivated(uname) == 0 {
+			c.JSON(406, gin.H{"message": "You account is not yet activated, please check you Email inbox and click Activate button."})
+			return
+		} else {
+		}
 	}
 
 	db := config.Connect()
 	defer db.Close()
-	var tmpUser models.UserLogin
-	sqlFindUsername := `SELECT id,username,password,userpicture,role,otp,isactivated,email FROM USERS WHERE username=$1;`
-	rowUsername := db.QueryRow(sqlFindUsername, uname)
-	err2 := rowUsername.Scan(&tmpUser.ID, &tmpUser.UserName, &tmpUser.PassWord, &tmpUser.Userpicture, &tmpUser.Role, &tmpUser.Otp, &tmpUser.IsActivated, &tmpUser.Email)
-	if err2 != nil {
-		fmt.Println(err2)
-	}
+	var tmpUser11 = new(models.Users)
+	if err2 := db.Model(tmpUser11).Where("username = ?", uname).Select(); err2 != nil {
+		log.Print(err2.Error())
+		return
+	} else {
+		hPwd := tmpUser11.Password
+		log.Print("Hash Password : ", hPwd)
+		if utilz.ComparePassword(hPwd, utilz.EncryptPassword(pwd2)) {
+			xid := tmpUser11.ID
+			tk := &models.Token{UserId: uint(xid)}
+			token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+			tokenString, _ := token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+			totp := strconv.FormatInt(tmpUser11.Otp, 2)
+			isActive := strconv.FormatInt(tmpUser11.Isactivated, 2)
+			msg := map[string]string{"id": strconv.Itoa(int(xid)), "username": tmpUser11.Username, "token": tokenString, "userpicture": tmpUser11.Userpicture, "role": tmpUser11.Role, "otp": totp, "isactivated": isActive, "email": tmpUser11.Email}
+			c.JSON(http.StatusOK, msg)
 
-	hPwd := tmpUser.PassWord
-
-	if utilz.ComparePassword(hPwd, utilz.EncryptPassword(pwd2)) {
-		xid := utilz.GetUID(uname)
-		ids, err := strconv.ParseInt(xid, 10, 64)
-		if err != nil {
-			panic(err)
+		} else {
+			c.JSON(401, gin.H{"message": "Wrong password."})
+			return
 		}
 
-		tk := &models.Token{UserId: uint(ids)}
-		token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-		tokenString, _ := token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
-		tmpUser.Token = tokenString
-		totp := strconv.FormatInt(tmpUser.Otp, 2)
-		isActive := strconv.FormatInt(tmpUser.IsActivated, 2)
-		msg := map[string]string{"id": xid, "username": tmpUser.UserName, "token": tmpUser.Token, "userpicture": tmpUser.Userpicture, "role": tmpUser.Role, "otp": totp, "isactivated": isActive, "email": tmpUser.Email}
-		c.JSON(http.StatusOK, msg)
-	} else {
-		c.JSON(401, gin.H{"message": "Wrong password."})
-		return
 	}
 }

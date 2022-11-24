@@ -4,10 +4,21 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"gorm.io/gorm"
 	// "github.com/golang-jwt/jwt"
 	// "gorm.io/gorm"
 )
+
+type Users struct {
+	ID          int64
+	Username    string `binding:"required,min=5,max=30"`
+	Password    string `binding:"required,min=100,max=100"`
+	Userpicture string `binding:"required,min=10,max=10"`
+	Isactivated int64
+	Otp         int64
+	Email       string `binding:"required,min=100,max=100"`
+	Role        string `binding:"required,min=10,max=10"`
+	// Token       string `binding:"required,min=200,max=200"`
+}
 
 type User struct {
 	ID          int64     `json:"id"`
@@ -50,24 +61,29 @@ type TempUsers struct {
 	Mailtoken   string `json:"mailtoken"`
 }
 
-type UserLogin struct {
-	gorm.Model
-	ID          uint   `json:"id"`
-	UserName    string `json:"username"`
-	PassWord    string `json:"password"`
-	Email       string `json:"email"`
-	Userpicture string `json:"userpicture"`
-	Token       string `json:"token"`
-	Role        string `json:"role"`
-	Otp         int64  `json:"otp"`
-	IsActivated int64  `json:"isactivated"`
+type Userlogin struct {
+	ID          int
+	Username    string `binding:"required,min=5,max=30"`
+	Password    string `binding:"required,min=100,max=100"`
+	Userpicture string `binding:"required,min=10,max=10"`
+	Isactivated int64
+	Otp         int64
+	Email       string `binding:"required,min=100,max=100"`
+	Role        string `binding:"required,min=10,max=10"`
+	Token       string `binding:"required,min=200,max=200"`
+	// Email       string `json:"email"`
+	// Token       string `json:"token"`
+	// Role        string `json:"role"`
+	// Otp         int64  `json:"otp"`
+	// IsActivated int64  `json:"isactivated"`
 }
 
 // Token       string `json:"token";sql:"-"`
 
 type TmpLogin struct {
 	UserName string `json:"username"`
-	PassWord string `json:"passwd"`
+	PassWord string `json:"password"`
+	Token    string `json:"token"`
 }
 
 type Mfa struct {

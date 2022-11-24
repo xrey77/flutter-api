@@ -1,23 +1,36 @@
 package config
 
-// go get github.com/go-pg/pg/v10
-
 import (
-	"database/sql"
 	"log"
+	"os"
 
-	_ "github.com/lib/pq"
+	"github.com/go-pg/pg/v10"
 )
 
-// create connection with postgres db
-func Connect() *sql.DB {
-	conn := DotEnvVariable("DATABASE_URL")
-	db, err2 := sql.Open("postgres", conn)
-	if err2 != nil {
-		log.Fatal(err2)
+var db *pg.DB
 
+func Connect() *pg.DB {
+
+	var (
+		opts *pg.Options
+		err  error
+	)
+	opts, err = pg.ParseURL(os.Getenv("DATABASE_URL"))
+
+	// opts = &pg.Options{
+	// 	User:     "rey",
+	// 	Password: "rey",
+	// 	Addr:     "127.0.0.1:8090",
+	// 	Database: "global-api-10",
+	// }
+
+	if err != nil {
+		log.Print("Unable to connect to Postgres Database")
+		return nil
 	} else {
-		log.Print("connected to Postgresql..")
+		log.Print("Connected to Postgres DAtabase")
 	}
+	db := pg.Connect(opts)
 	return db
+
 }
