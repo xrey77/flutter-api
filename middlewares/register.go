@@ -14,15 +14,15 @@ func Register(c *gin.Context) {
 
 	cnt := utilz.GetNextval()
 
-	var user = new(models.User)
-	err := json.NewDecoder(c.Request.Body).Decode(&user)
+	var usermodel = new(models.User)
+	err := json.NewDecoder(c.Request.Body).Decode(&usermodel)
 	if err != nil {
 		log.Fatalf("Unable to decode the request body.  %v", err)
 	}
 	c.Header("Content-Type", "application/json;charset=UTF-8")
-	email := user.Email
-	username := user.Username
-	pwd := user.Password
+	email := usermodel.Email
+	username := usermodel.Username
+	pwd := usermodel.Password
 
 	if utilz.ValidateEmail(email) > 0 {
 		c.JSON(405, gin.H{"message": "Email has already taken."})
@@ -42,14 +42,14 @@ func Register(c *gin.Context) {
 	hashPwd := utilz.HashAndSalt(xbyte)
 
 	urlpic := "http://localhost:9000/assets/users/pix.png"
-	user.ID = cnt
-	user.Password = hashPwd
-	user.Userpicture = urlpic
-	user.Secretkey = ""
-	user.Qrcode = ""
+	usermodel.ID = cnt
+	usermodel.Password = hashPwd
+	usermodel.Userpicture = urlpic
+	usermodel.Secretkey = ""
+	usermodel.Qrcode = ""
 
 	//INSERT DATA
-	_, err3 := db.Model(user).Insert()
+	_, err3 := db.Model(usermodel).Insert()
 	if err3 != nil {
 		// c.JSON(500, gin.H{"message 2": err3.Error()})
 		c.JSON(500, gin.H{"message": "Unable to execute the query."})

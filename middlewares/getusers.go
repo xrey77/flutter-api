@@ -13,19 +13,19 @@ func GetUsers(c *gin.Context) {
 
 	_, err := ExtractTokenMetadata(c.Request)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "unauthorized")
+		c.JSON(http.StatusUnauthorized, "Unauthorized Access")
 		return
 	}
 
 	db := config.Connect()
 	defer db.Close()
 	var users models.User
-	var userx []models.User
-	err2 := db.Model(&users).Column("*").Order("id").Select(&userx)
+	var jsondata []models.User
+	err2 := db.Model(&users).Column("*").Order("id").Select(&jsondata)
 	if err2 != nil {
 		c.JSON(200, gin.H{"message": err2.Error()})
 		return
 	} else {
-		c.JSON(200, userx)
+		c.JSON(200, jsondata)
 	}
 }

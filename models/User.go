@@ -4,8 +4,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	// "github.com/golang-jwt/jwt"
-	// "gorm.io/gorm"
 )
 
 type Users struct {
@@ -35,8 +33,22 @@ type User struct {
 	Otp         int64     `json:"otp"`
 	Secretkey   string    `json:"secretkey"`
 	Qrcode      string    `json:"qrcode"`
-	Createdat   time.Time `json:"createdat"`
-	Updatedat   time.Time `json:"updatedat"`
+	Updated_at  time.Time `json:"updated_at"`
+	Created_at  time.Time `json:"created_at"`
+}
+
+type Userz struct {
+	ID          int64
+	Lastname    string `binding:"required,min=30,max=30"`
+	Firstname   string `binding:"required,min=30,max=30"`
+	Email       string `binding:"required,min=150,max=150"`
+	Mobile      string `binding:"required,min=30,max=30"`
+	Username    string `binding:"required,min=30,max=30"`
+	Userpicture string `binding:"required,min=100,max=100"`
+	Role        string `binding:"required,min=10,max=10"`
+	Password    string `binding:"required,min=420,max=420"`
+	Qrcode      string `binding:"required,min=150,max=150"`
+	UpdatedAt   time.Time
 }
 
 type Token struct {
@@ -74,10 +86,10 @@ type Tempusers struct {
 	Isactivated int64
 	Mailtoken   string `binding:"required,min=50,max=50"`
 	Otp         int64
-	Secretkey   string `binding:"required,min=250,max=250"`
-	Qrcode      string `binding:"required,min=350,max=350"`
-	Createdat   time.Time
-	Updatedat   time.Time
+	Secretkey   string    `binding:"required,min=250,max=250"`
+	Qrcode      string    `binding:"required,min=350,max=350"`
+	Updated_at  time.Time `json:"updated_at"`
+	Created_at  time.Time `json:"created_at"`
 }
 
 type Userlogin struct {
