@@ -56,6 +56,6 @@ func Register(c *gin.Context) {
 		return
 	} else {
 		msg := "You have registered successfully."
-		c.JSON(200, gin.H{"message": msg})
+		c.JSON(201, gin.H{"message": msg})
 	}
 }

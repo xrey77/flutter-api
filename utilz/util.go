@@ -1,11 +1,16 @@
 package utilz
 
 import (
+	"bufio"
 	"encoding/json"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"os"
 	"src/flutter-api/config"
 	"src/flutter-api/models"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -54,9 +59,8 @@ func GetNextval() int64 {
 	defer db.Close()
 	var users models.Users
 	err := db.Model(&users).Last()
-	log.Print("Count : ", users.ID)
 	if err != nil {
-		log.Print(err)
+		log.Print(err.Error())
 		return 0
 	} else {
 		return int64(users.ID) + 1
@@ -134,7 +138,48 @@ func GetOTP(usname string) int64 {
 func HashAndSalt(pwd []byte) string {
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 	}
 	return string(hash)
+}
+
+func RandomToken() string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	var codes [6]byte
+	for i := 0; i < 6; i++ {
+		codes[i] = uint8(48 + r.Intn(10))
+	}
+	return string(codes[:])
+}
+
+func PromptForPasscode() string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter Passcode: ")
+	text, _ := reader.ReadString('\n')
+	return text
+}
+
+func ValidateContact(cname string) int64 {
+	db := config.Connect()
+	defer db.Close()
+	tmpContact := new(models.Contact)
+	if err2 := db.Model(tmpContact).Where("contact_name = ?", cname).Select(); err2 != nil {
+		return 0
+	} else {
+		return 1
+	}
+}
+
+func GetCID() int64 {
+	db := config.Connect()
+	defer db.Close()
+	var contacts models.Contact
+	err := db.Model(&contacts).Last()
+	if err != nil {
+		log.Print(err.Error())
+		return 0
+	} else {
+		return int64(contacts.ID) + 1
+	}
 }

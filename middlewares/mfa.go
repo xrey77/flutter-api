@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"log"
 	"net/http"
 
 	"src/flutter-api/globalvar"
@@ -18,7 +17,6 @@ func Mfaverfication(c *gin.Context) {
 	uname := globalvar.GetUsername()
 	secretBase32 := getsecretkey(uname)
 
-	log.Println("Secret Key 2 : " + secretBase32)
 	otpc := &dgoogauth.OTPConfig{
 		Secret:      secretBase32,
 		WindowSize:  3,
@@ -27,12 +25,12 @@ func Mfaverfication(c *gin.Context) {
 
 	val, err := otpc.Authenticate(mfaToken)
 	if err != nil {
-		c.JSON(200, gin.H{"statuscode": 400, "message": err.Error()})
+		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 
 	if !val {
-		c.JSON(200, gin.H{"statuscode": 400, "message": "OTP Token is not valid."})
+		c.JSON(400, gin.H{"message": "OTP Token is not valid."})
 		return
 	}
 	c.JSON(200, gin.H{"statuscode": 200, "message": "MFA Verfication successfull."})

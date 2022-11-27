@@ -24,9 +24,9 @@ func DeleteUser(c *gin.Context) {
 	_, err = db.Model(usermodel).Where("id = ?", idno).Delete()
 	if err != nil {
 		fmt.Println("err 1...." + err.Error())
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		c.JSON(404, gin.H{"message": err.Error()})
 		return
 	} else {
-		c.JSON(http.StatusNotFound, gin.H{"message": "User ID,  has been deleted."})
+		c.JSON(200, gin.H{"message": "User ID,  has been deleted."})
 	}
 }
