@@ -6,7 +6,6 @@ package middlewares
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 
 	"src/flutter-api/config"
@@ -17,17 +16,18 @@ import (
 
 func GetProductpages(c *gin.Context) {
 
-	_, err := ExtractTokenMetadata(c.Request)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, "Unauthorized Access")
-		return
-	}
+	// _, err := ExtractTokenMetadata(c.Request)
+	// if err != nil {
+	// 	c.JSON(403, "Unauthorized Access")
+	// 	return
+	// }
 
 	//PAGE NUMBER
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	// page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	page, _ := strconv.Atoi(c.Query("page"))
 
 	//PER PAGE
-	perPage, _ := strconv.Atoi(c.DefaultQuery("perPage", "10"))
+	perPage, _ := strconv.Atoi(c.DefaultQuery("perPage", "12"))
 
 	// var total_page float64 = math.Ceil(float64(total_rec / int64(perPage)))
 
@@ -37,7 +37,6 @@ func GetProductpages(c *gin.Context) {
 	//SEARCH KEY
 	search := c.Query("find")
 
-	log.Print("Search : ", search)
 	//TOTAL RECORDS
 	var total_rec int64 = totalRecs(search)
 	//TOTAL PAGES
@@ -53,14 +52,14 @@ func GetProductpages(c *gin.Context) {
 	if search != "" {
 
 		var products []models.Products
-		var sql = `SELECT id,prod_pic,prod_desc,prod_saleprice FROM products WHERE LOWER(prod_desc) LIKE ?  ORDER BY id`
+		var sql = `SELECT * FROM products WHERE LOWER(prod_desc) LIKE '%' || ? || '%'  ORDER BY id`
 		sql = fmt.Sprintf("%s LIMIT %d OFFSET %d", sql, perPage, (page-1)*perPage)
-		_, err := db.Query(&products, sql, "%"+search+"%")
+		_, err := db.Query(&products, sql, search)
 		if err != nil {
 			c.JSON(404, "No data found.")
 			return
 		} else {
-			c.JSON(http.StatusOK, gin.H{"data": products, "totalRecs": total_rec, "page": page, "perPage": perPage, "totalPages": totalPages})
+			c.JSON(200, gin.H{"data": products, "totalRecs": total_rec, "page": page, "perPage": perPage, "totalPages": totalPages})
 		}
 
 	} else {
