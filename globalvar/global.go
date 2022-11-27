@@ -1,3 +1,7 @@
+// *** Author : Reynald Marquez-Gragasin
+// *** Email : reynald88@yahoo.com
+// *** Program Name : FLUTTER-API
+
 package globalvar
 
 var USERNAME string

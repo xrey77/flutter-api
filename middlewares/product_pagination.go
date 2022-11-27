@@ -1,5 +1,8 @@
-// ***
-// *** Syntax : http://localhost:9000/getproductpages?find=women
+// *** Author : Reynald Marquez-Gragasin
+// *** Email : reynald88@yahoo.com
+// *** Program Name : FLUTTER-API
+// *** Syntax : http://localhost:9000/getproductpages?page=1;find=women
+// ***          http://localhost:9000/getproductpages?page=1
 
 package middlewares
 
