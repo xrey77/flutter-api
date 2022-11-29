@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-
 	"src/flutter-api/config"
 	"src/flutter-api/models"
 

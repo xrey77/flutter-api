@@ -13,11 +13,12 @@ require (
 	github.com/xlzd/gotp v0.1.0
 	golang.org/x/crypto v0.3.0
 	golang.org/x/image v0.1.0
+	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/mail.v2 v2.3.1
-	gorm.io/gorm v1.24.1
 )
 
 require (
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/vmihailenco/bufpool v0.1.11 // indirect
@@ -36,7 +37,6 @@ require (
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

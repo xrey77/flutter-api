@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"src/flutter-api/models"
@@ -23,7 +22,9 @@ func AddContact(c *gin.Context) {
 	var contact models.Contact
 	err = json.NewDecoder(c.Request.Body).Decode(&contact)
 	if err != nil {
-		log.Fatalf("Unable to decode the request body.  %v", err)
+		// log.Fatalf("Unable to decode the request body.  %v", err)
+		c.JSON(http.StatusBadRequest, "Unable to decode the request body.")
+		return
 	}
 	if utilz.ValidateContact(contact.Contact_name) != 0 {
 		c.JSON(400, gin.H{"message": "Contact Name is already taken."})

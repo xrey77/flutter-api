@@ -6,6 +6,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"src/flutter-api/middlewares"
 	"text/template"
 	"time"
@@ -22,13 +23,19 @@ import (
 var tpl = template.Must(template.ParseGlob("templates/*"))
 
 func init() {
-	err1 := godotenv.Load(".env")
-	if err1 != nil {
+	err := godotenv.Load(".env")
+	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
 }
 
 func main() {
+	// watcher, err := fsnotify.NewWatcher()
+	// if err != nil {
+	// 	log.Println("NewWatcher failed: ", err)
+	// }
+	// defer watcher.Close()
+
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -94,10 +101,38 @@ func main() {
 	// // })
 
 	// http.ListenAndServe(":9000", router)
-	if err := router.Run(":9000"); err != nil {
-		log.Print("may error....", err)
-	} else {
-		log.Print("GIN Server is listnening in port : 9000")
+
+	// done := make(chan bool)
+	// go func() {
+	// defer close(done)
+
+	// for {
+	// 	select {
+	// 	case event, ok := <-watcher.Events:
+	// 		if !ok {
+	// 			return
+	// 		}
+	// 		log.Printf("%s %s\n", event.Name, event.Op)
+	// 	case err, ok := <-watcher.Errors:
+	// 		if !ok {
+	// 			return
+	// 		}
+	// 		log.Println("error:", err)
+	// 	}
+	// }
+
+	// }()
+
+	// err = watcher.Add("./middlewares/")
+	// if err != nil {
+	// 	log.Print("Add failed:", err)
+	// } else {
+
+	// }
+	// <-done
+
+	if err := http.ListenAndServe(":9000", router); err != nil {
+		log.Print(err.Error())
 	}
 
 }
